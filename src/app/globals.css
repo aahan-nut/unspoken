@@ -1,0 +1,92 @@
+@import "tailwindcss";
+
+:root {
+  /* Warm Neutrals — page, surface, text, borders */
+  --warm-50: #fbf8f4;
+  --warm-100: #f5f0ea;
+  --warm-200: #ede3d8;
+  --warm-400: #c7b39b;
+  --warm-600: #8a7057;
+  --warm-900: #2b2420;
+
+  /* Sage — calm, growth, secondary actions & success */
+  --sage-100: #e4ece6;
+  --sage-200: #cadbce;
+  --sage-400: #98b6a2;
+  --sage-500: #7b9e89;
+  --sage-600: #63866f;
+  --sage-800: #3b5342;
+
+  /* Semantic tokens */
+  --background: var(--warm-50);
+  --foreground: var(--warm-900);
+  --muted: var(--warm-600);
+  --border: var(--warm-200);
+  --card: var(--warm-100);
+  --primary: var(--sage-600);
+  --primary-hover: var(--sage-800);
+  --primary-foreground: #ffffff;
+  --secondary: var(--sage-100);
+  --secondary-foreground: var(--sage-800);
+  --accent-sage: var(--sage-500);
+  --accent-sage-light: var(--sage-200);
+  --destructive: #dc2626;
+  --ring: var(--sage-500);
+  --radius: 0.75rem;
+}
+
+@theme inline {
+  /* Semantic */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-card: var(--card);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent-sage: var(--accent-sage);
+  --color-accent-sage-light: var(--accent-sage-light);
+  --color-destructive: var(--destructive);
+  --color-ring: var(--ring);
+
+  /* Warm scale */
+  --color-warm-50: var(--warm-50);
+  --color-warm-100: var(--warm-100);
+  --color-warm-200: var(--warm-200);
+  --color-warm-400: var(--warm-400);
+  --color-warm-600: var(--warm-600);
+  --color-warm-900: var(--warm-900);
+
+  /* Sage scale */
+  --color-sage-100: var(--sage-100);
+  --color-sage-200: var(--sage-200);
+  --color-sage-400: var(--sage-400);
+  --color-sage-500: var(--sage-500);
+  --color-sage-600: var(--sage-600);
+  --color-sage-800: var(--sage-800);
+
+  --font-sans: var(--font-inter);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
