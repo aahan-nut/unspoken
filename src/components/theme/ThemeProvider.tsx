@@ -1,5 +1,6 @@
 "use client";
 
+import { useClientValue } from "@/lib/useClientValue";
 import {
   createContext,
   useCallback,
@@ -21,27 +22,28 @@ const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
 const STORAGE_KEY = "unspoken-theme";
 
+function readStoredTheme(): Theme {
+  const stored = localStorage.getItem(STORAGE_KEY) as Theme | null;
+  return stored === "night" ? "night" : "day";
+}
+
 function applyTheme(theme: Theme) {
   document.documentElement.classList.toggle("dark", theme === "night");
   document.documentElement.style.colorScheme = theme === "night" ? "dark" : "light";
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("day");
-  const [mounted, setMounted] = useState(false);
+  const storedTheme = useClientValue(readStoredTheme, "day");
+  const [override, setOverride] = useState<Theme | null>(null);
+  const theme = override ?? storedTheme;
 
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY) as Theme | null;
-    const initial: Theme = stored === "night" ? "night" : "day";
-    setThemeState(initial);
-    applyTheme(initial);
-    setMounted(true);
-  }, []);
+    applyTheme(theme);
+  }, [theme]);
 
   const setTheme = useCallback((next: Theme) => {
-    setThemeState(next);
+    setOverride(next);
     localStorage.setItem(STORAGE_KEY, next);
-    applyTheme(next);
   }, []);
 
   const toggleTheme = useCallback(() => {
@@ -49,9 +51,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [theme, setTheme]);
 
   return (
-    <ThemeContext.Provider
-      value={{ theme: mounted ? theme : "day", setTheme, toggleTheme }}
-    >
+    <ThemeContext.Provider value={{ theme, setTheme, toggleTheme }}>
       {children}
     </ThemeContext.Provider>
   );

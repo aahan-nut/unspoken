@@ -12,13 +12,15 @@ import {
   CardTitle,
 } from "@/components/ui/Card";
 import { Disclaimer } from "@/components/ui/Disclaimer";
-import { howItWorksSteps } from "@/lib/mock-data";
+import { journeySteps, type JourneyStep } from "@/data/siteContent";
 import {
+  ChevronRight,
   Heart,
   MessageSquare,
   Shield,
   Users,
 } from "lucide-react";
+import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -54,32 +56,51 @@ const principles = [
   },
 ];
 
+function JourneyStepCard({ step }: { step: JourneyStep }) {
+  const content = (
+    <Card hover={Boolean(step.href)} padding="md" className="flex h-full flex-col">
+      <div className="mb-3 flex items-center gap-3">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary text-sm font-bold text-primary-foreground">
+          {step.step}
+        </div>
+        <step.icon className="h-5 w-5 text-muted" aria-hidden="true" />
+      </div>
+      <h3 className="mb-1 font-semibold text-foreground">{step.title}</h3>
+      <p className="text-sm leading-relaxed text-muted">{step.description}</p>
+    </Card>
+  );
+
+  return step.href ? (
+    <Link href={step.href} className="flex-1">
+      {content}
+    </Link>
+  ) : (
+    <div className="flex-1">{content}</div>
+  );
+}
+
 export default function HowItWorksPage() {
   return (
     <AppShell>
       <PageContainer>
         <SectionHeading
+          level="h1"
           title="How Unspoken works"
           description="A calm, step-by-step approach to understanding what you're feeling and finding your next step."
         />
 
         <Disclaimer className="mb-12" />
 
-        <div className="mb-16 space-y-6">
-          {howItWorksSteps.map((step) => (
-            <Card key={step.step} padding="lg" className="flex gap-6">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary text-lg font-bold text-primary-foreground">
-                {step.step}
-              </div>
-              <div>
-                <CardHeader>
-                  <CardTitle className="text-xl">{step.title}</CardTitle>
-                </CardHeader>
-                <CardDescription className="text-base">
-                  {step.description}
-                </CardDescription>
-              </div>
-            </Card>
+        <div className="mb-16 flex flex-col gap-4 lg:flex-row lg:items-stretch lg:gap-0">
+          {journeySteps.map((step, i) => (
+            <div key={step.step} className="flex items-stretch lg:contents">
+              <JourneyStepCard step={step} />
+              {i < journeySteps.length - 1 && (
+                <div className="hidden shrink-0 items-center justify-center px-2 lg:flex">
+                  <ChevronRight className="h-5 w-5 text-muted" aria-hidden="true" />
+                </div>
+              )}
+            </div>
           ))}
         </div>
 

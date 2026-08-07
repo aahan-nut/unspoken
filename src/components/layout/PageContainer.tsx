@@ -30,12 +30,17 @@ export function SectionHeading({
   description,
   centered = false,
   className,
+  level = "h2",
 }: {
   title: string;
   description?: string;
   centered?: boolean;
   className?: string;
+  /** Use "h1" when this is a page's single top-level heading, not a subsection. */
+  level?: "h1" | "h2";
 }) {
+  const Heading = level;
+
   return (
     <div
       className={cn(
@@ -44,9 +49,9 @@ export function SectionHeading({
         className
       )}
     >
-      <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+      <Heading className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
         {title}
-      </h2>
+      </Heading>
       {description && (
         <p
           className={cn(

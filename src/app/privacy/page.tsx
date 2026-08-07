@@ -4,12 +4,8 @@ import {
   SectionHeading,
 } from "@/components/layout/PageContainer";
 import { Alert } from "@/components/ui/Alert";
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import { Card, CardDescription } from "@/components/ui/Card";
 import { Disclaimer } from "@/components/ui/Disclaimer";
 import type { Metadata } from "next";
 
@@ -24,37 +20,61 @@ const privacySections = [
     id: "guest",
     title: "Guest use",
     content:
-      "You can use Unspoken without creating an account. In this demo version, check-in data is stored locally in your browser and is not sent to any server. When a backend is added, we'll clearly explain what data is collected and give you control over it.",
+      "You can use Unspoken without creating an account — today, and in every future version we build. Check-ins, saved resources, and notes are tied to your browser, not an identity. Nothing requires a name, email, or sign-up to get started.",
   },
   {
-    id: "data",
-    title: "Data & storage",
+    id: "future-accounts",
+    title: "Optional account use in a future version",
     content:
-      "This frontend demo does not connect to a database, authentication service, or AI model. Nothing you type is transmitted or stored on external servers. Clearing your browser data will remove any locally saved check-ins.",
+      "A future version may offer an optional account so your check-ins and saved resources can sync across devices. Creating an account would always be a choice — Unspoken will keep working as a full guest experience for anyone who prefers that.",
   },
   {
-    id: "control",
-    title: "Your control",
+    id: "future-storage",
+    title: "What information may eventually be stored",
     content:
-      "You decide what to share during a check-in, whether to save it, and when to delete it. We believe mental health tools should empower you, not create pressure to disclose more than you're comfortable with.",
+      "If accounts are introduced, we intend to store only what's needed to make the product useful: your check-in responses, saved resources with their status and notes, and basic preferences like your theme. We do not intend to store precise location, government ID, or health records.",
   },
   {
-    id: "safety",
-    title: "Safety information",
+    id: "minimal-collection",
+    title: "What information should not be collected unnecessarily",
     content:
-      "Unspoken is designed for self-reflection and resource navigation — not crisis intervention. If you or someone you know is in immediate danger, call 911 or the 988 Suicide & Crisis Lifeline. Crisis Text Line is available by texting HOME to 741741.",
+      "We intentionally avoid collecting details we don't need to help you — things like your legal name, school ID, government ID numbers, precise real-time location, or contact lists. If a future feature seems to need more than the minimum, we'll explain why before asking for it.",
   },
   {
-    id: "limits",
-    title: "What we don't do",
+    id: "deletion",
+    title: "User-controlled deletion",
     content:
-      "Unspoken does not provide therapy, medical advice, diagnoses, or treatment plans. Our guidance is general and supportive. For clinical concerns, please consult a licensed mental health professional.",
+      "You can already delete your local data at any time: remove a saved resource from the Saved Resources page, start a new check-in to overwrite the old one, or clear your browser's site data to remove everything at once. In a future account-based version, deleting your account would permanently delete your stored data.",
   },
   {
-    id: "future",
-    title: "Future updates",
+    id: "location",
+    title: "Location permissions",
     content:
-      "When backend services are added, this page will be updated with detailed information about data retention, third-party services, cookie usage, and your rights. We are committed to transparency before any data collection begins.",
+      "Unspoken does not access your device's precise location. The ZIP code or city field on the Resources page is a value you type in, used only to filter the sample listings shown in your browser — it is never read from device location services or sent anywhere.",
+  },
+  {
+    id: "ai-limits",
+    title: "AI limitations",
+    content:
+      "This prototype does not use a real AI model yet — the guidance you see is static, pre-written mock content. When AI-generated guidance is introduced, it will still have real limits: it cannot diagnose conditions, replace a licensed professional, or guarantee it fully understands your situation. Always use your own judgment and seek a professional for anything serious.",
+  },
+  {
+    id: "crisis-limits",
+    title: "Crisis limitations",
+    content:
+      "Unspoken is not a crisis service. It cannot see, monitor, or respond to you in real time, detect an emergency, or dispatch help. If you or someone you know is in immediate danger, use the Crisis Support page or contact 911 or the 988 Suicide & Crisis Lifeline directly — do not rely on this app during an emergency.",
+  },
+  {
+    id: "no-selling",
+    title: "No selling of private journal or check-in data",
+    content:
+      "We will never sell, rent, or share your check-in responses, notes, or journal-style reflections with advertisers or data brokers. Any future data use will be limited to operating and improving Unspoken itself, and explained in plain language before it happens.",
+  },
+  {
+    id: "prototype",
+    title: "Prototype disclaimer",
+    content:
+      "This is a frontend prototype. There is no backend server, database, authentication system, or AI model behind it. All resources shown are mock data, and everything you enter — check-ins, saved resources, statuses, and notes — is stored only in your browser's local storage. Clearing your browser data or switching devices will remove it permanently.",
   },
 ];
 
@@ -63,23 +83,19 @@ export default function PrivacyPage() {
     <AppShell>
       <PageContainer narrow>
         <SectionHeading
+          level="h1"
           title="Privacy & safety"
           description="How we approach your privacy, data, and safety on Unspoken."
         />
 
         <Disclaimer className="mb-10" />
 
-        <Alert variant="info" className="mb-10">
-          This is a frontend demo. No data leaves your browser. The policies
-          below describe our intended approach when the full platform launches.
-        </Alert>
-
         <div className="space-y-6">
           {privacySections.map((section) => (
             <Card key={section.id} id={section.id} className="scroll-mt-24">
-              <CardHeader>
-                <CardTitle>{section.title}</CardTitle>
-              </CardHeader>
+              <h2 className="mb-3 text-lg font-semibold text-foreground">
+                {section.title}
+              </h2>
               <CardDescription className="text-base leading-relaxed">
                 {section.content}
               </CardDescription>
@@ -101,6 +117,11 @@ export default function PrivacyPage() {
               </li>
             </ul>
           </Alert>
+          <div className="mt-4">
+            <Button variant="outline" href="/crisis">
+              Go to Crisis Support
+            </Button>
+          </div>
         </section>
       </PageContainer>
     </AppShell>

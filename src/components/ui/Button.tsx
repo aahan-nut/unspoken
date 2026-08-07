@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
-import type { ButtonHTMLAttributes, ReactNode } from "react";
+import type { ButtonHTMLAttributes, MouseEventHandler, ReactNode } from "react";
 
 type ButtonVariant = "primary" | "secondary" | "ghost" | "outline" | "destructive";
 type ButtonSize = "sm" | "md" | "lg";
@@ -40,6 +40,7 @@ export function Button({
   disabled,
   className,
   children,
+  onClick,
   ...props
 }: ButtonProps) {
   const classes = cn(
@@ -52,14 +53,18 @@ export function Button({
 
   if (href) {
     return (
-      <Link href={href} className={classes}>
+      <Link
+        href={href}
+        className={classes}
+        onClick={onClick as unknown as MouseEventHandler<HTMLAnchorElement>}
+      >
         {children}
       </Link>
     );
   }
 
   return (
-    <button className={classes} disabled={disabled || loading} {...props}>
+    <button className={classes} disabled={disabled || loading} onClick={onClick} {...props}>
       {loading && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
       {children}
     </button>

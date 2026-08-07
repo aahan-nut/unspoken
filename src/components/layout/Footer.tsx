@@ -7,6 +7,7 @@ const footerLinks = {
     { href: "/how-it-works", label: "How It Works" },
   ],
   safety: [
+    { href: "/crisis", label: "Crisis Help" },
     { href: "tel:988", label: "988 Crisis Lifeline" },
     { href: "https://www.crisistextline.org", label: "Crisis Text Line" },
     { href: "tel:911", label: "Emergency (911)" },
@@ -14,7 +15,7 @@ const footerLinks = {
   legal: [
     { href: "/privacy", label: "Privacy Policy" },
     { href: "/privacy#safety", label: "Safety Information" },
-    { href: "/privacy#data", label: "Data & Storage" },
+    { href: "/privacy#prototype", label: "Data & Storage" },
   ],
 };
 

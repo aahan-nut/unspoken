@@ -3,87 +3,132 @@
 import { PageContainer } from "@/components/layout/PageContainer";
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
+import { CheckInOptionCard } from "@/components/ui/CheckInOptionCard";
 import { Disclaimer } from "@/components/ui/Disclaimer";
-import { FieldWrapper, Textarea } from "@/components/ui/FormField";
+import { Textarea } from "@/components/ui/FormField";
 import { ProgressIndicator } from "@/components/ui/ProgressIndicator";
-import { checkInGuidance, moodOptions } from "@/lib/mock-data";
-import { cn } from "@/lib/utils";
+import { saveCheckIn } from "@/lib/localStorage";
+import { saveSupportResult } from "@/lib/sessionState";
+import { FetchTimeoutError, postJSON } from "@/lib/fetchJson";
+import { MAX_REFLECTION_LENGTH } from "@/lib/safety/constants";
+import { isCrisisClassification } from "@/lib/safety/types";
+import type { ClassificationResult, SupportResponseResult } from "@/lib/safety/types";
 import {
-  ArrowLeft,
-  ArrowRight,
-  BookOpen,
-  MessageSquare,
-  Sparkles,
-  Users,
-} from "lucide-react";
+  durationOptions,
+  feelingOptions,
+  intensityOptions,
+  lifeAreaOptions,
+  supportOptions,
+} from "@/data/mockSupportResponses";
+import type { Duration, Feeling, Intensity, SupportType } from "@/types/checkIn";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useState } from "react";
 
-const stepLabels = ["How you feel", "What's on your mind", "Guidance", "Next steps"];
+const TOTAL_STEPS = 6;
 
-type NextStep = "journal" | "reach-out" | "resources" | "rest";
+const stepLabels = [
+  "Feeling",
+  "Intensity",
+  "Duration",
+  "Life areas",
+  "Reflection",
+  "Support",
+];
 
 export function CheckInFlow() {
+  const router = useRouter();
   const [step, setStep] = useState(1);
-  const [selectedMood, setSelectedMood] = useState<string | null>(null);
-  const [thoughts, setThoughts] = useState("");
-  const [selectedNextStep, setSelectedNextStep] = useState<NextStep | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
 
-  const guidance = selectedMood ? checkInGuidance[selectedMood] ?? checkInGuidance.unsure : [];
+  const [feeling, setFeeling] = useState<Feeling | null>(null);
+  const [intensity, setIntensity] = useState<Intensity | null>(null);
+  const [duration, setDuration] = useState<Duration | null>(null);
+  const [lifeAreas, setLifeAreas] = useState<string[]>([]);
+  const [reflection, setReflection] = useState("");
+  const [support, setSupport] = useState<SupportType | null>(null);
 
-  const handleNext = () => {
-    if (step === 2) {
-      setIsLoading(true);
-      setTimeout(() => {
-        setIsLoading(false);
-        setStep(3);
-      }, 1200);
-      return;
-    }
-    setStep((s) => Math.min(s + 1, 4));
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  const toggleLifeArea = (value: string) => {
+    setLifeAreas((prev) =>
+      prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
+    );
   };
 
+  const goNext = () => setStep((s) => Math.min(s + 1, TOTAL_STEPS));
   const handleBack = () => setStep((s) => Math.max(s - 1, 1));
 
-  const canProceed =
-    (step === 1 && selectedMood) ||
-    (step === 2 && thoughts.trim().length > 0) ||
-    step === 3 ||
-    (step === 4 && selectedNextStep);
+  const handleSkip = () => {
+    if (step === 4) setLifeAreas([]);
+    if (step === 5) setReflection("");
+    goNext();
+  };
 
-  const nextStepOptions: {
-    value: NextStep;
-    label: string;
-    description: string;
-    icon: typeof BookOpen;
-  }[] = [
-    {
-      value: "journal",
-      label: "Write it out",
-      description: "Spend a few more minutes journaling your thoughts privately.",
-      icon: BookOpen,
-    },
-    {
-      value: "reach-out",
-      label: "Prepare to reach out",
-      description: "Practice what you might say to someone you trust.",
-      icon: MessageSquare,
-    },
-    {
-      value: "resources",
-      label: "Find a resource",
-      description: "Browse support options that match what you're going through.",
-      icon: Users,
-    },
-    {
-      value: "rest",
-      label: "Just rest for now",
-      description: "That's okay too. Checking in was enough for today.",
-      icon: Sparkles,
-    },
-  ];
+  const handleFinish = async () => {
+    if (isSubmitting || !feeling || !intensity || !duration) return;
+
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    const checkInPayload = { feeling, intensity, duration, lifeAreas, reflection };
+
+    try {
+      // The frontend never decides the safety category itself — it only
+      // branches on what the backend returns.
+      const classification = await postJSON<ClassificationResult>(
+        "/api/safety/classify",
+        checkInPayload
+      );
+
+      saveCheckIn({
+        feeling,
+        intensity,
+        duration,
+        lifeAreas,
+        reflection,
+        support,
+        completedAt: new Date().toISOString(),
+      });
+
+      if (isCrisisClassification(classification)) {
+        router.push("/crisis");
+        return;
+      }
+
+      const supportResult = await postJSON<SupportResponseResult>("/api/support-response", {
+        ...checkInPayload,
+        safetyLevel: classification.safetyLevel,
+        support,
+      });
+
+      if (isCrisisClassification(supportResult)) {
+        router.push("/crisis");
+        return;
+      }
+
+      saveSupportResult(supportResult);
+      router.push("/support");
+    } catch (error) {
+      setSubmitError(
+        error instanceof FetchTimeoutError
+          ? "This is taking longer than expected. Please try again."
+          : "Something went wrong submitting your check-in. Please try again."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const canContinue =
+    (step === 1 && feeling !== null) ||
+    (step === 2 && intensity !== null) ||
+    (step === 3 && duration !== null) ||
+    (step === 4 && lifeAreas.length > 0) ||
+    (step === 5 && reflection.trim().length > 0);
+
+  const showSkip = step === 4 || step === 5;
 
   return (
     <PageContainer narrow>
@@ -105,150 +150,177 @@ export function CheckInFlow() {
 
       <ProgressIndicator
         currentStep={step}
-        totalSteps={4}
+        totalSteps={TOTAL_STEPS}
         labels={stepLabels}
         className="mb-8"
       />
 
       <Disclaimer className="mb-8" />
 
-      {/* Step 1: Mood selection */}
+      {/* Step 1: Feeling */}
       {step === 1 && (
         <div className="space-y-6">
           <div>
             <h2 className="text-lg font-medium text-foreground">
-              How are you feeling right now?
+              What&apos;s closest to how you&apos;re feeling?
             </h2>
             <p className="mt-1 text-sm text-muted">
-              Choose the option that feels closest — or pick &ldquo;Not sure&rdquo; if
-              nothing fits perfectly.
+              Pick whatever fits best right now. This is just a starting point, not a
+              label.
             </p>
           </div>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {moodOptions.map((mood) => (
-              <button
-                key={mood.value}
-                onClick={() => setSelectedMood(mood.value)}
-                className={cn(
-                  "rounded-xl border-2 px-4 py-3 text-sm font-medium transition-all duration-200",
-                  selectedMood === mood.value
-                    ? "border-primary bg-primary/5 text-primary shadow-sm"
-                    : "border-border bg-card text-foreground hover:border-primary/30"
-                )}
-              >
-                {mood.label}
-              </button>
+          <div
+            className="grid grid-cols-2 gap-3 sm:grid-cols-4"
+            role="group"
+            aria-label="Feeling"
+          >
+            {feelingOptions.map((option) => (
+              <CheckInOptionCard
+                key={option.value}
+                label={option.label}
+                selected={feeling === option.value}
+                onClick={() => setFeeling(option.value)}
+              />
             ))}
           </div>
         </div>
       )}
 
-      {/* Step 2: Thoughts */}
+      {/* Step 2: Intensity */}
       {step === 2 && (
         <div className="space-y-6">
           <div>
             <h2 className="text-lg font-medium text-foreground">
-              What&apos;s on your mind?
+              How much is it showing up for you?
             </h2>
             <p className="mt-1 text-sm text-muted">
-              Write as much or as little as you want. This stays on your device.
+              There&apos;s no right amount — just what feels true.
             </p>
           </div>
-          <FieldWrapper
-            label="Your thoughts"
-            htmlFor="thoughts"
-            hint="Only you can see this. Be honest with yourself."
-          >
-            <Textarea
-              id="thoughts"
-              placeholder="I've been feeling... lately because..."
-              value={thoughts}
-              onChange={(e) => setThoughts(e.target.value)}
-              rows={6}
-            />
-          </FieldWrapper>
+          <div className="space-y-3" role="group" aria-label="Intensity">
+            {intensityOptions.map((option) => (
+              <CheckInOptionCard
+                key={option.value}
+                label={option.label}
+                description={option.description}
+                selected={intensity === option.value}
+                onClick={() => setIntensity(option.value)}
+              />
+            ))}
+          </div>
         </div>
       )}
 
-      {/* Step 3: Guidance */}
+      {/* Step 3: Duration */}
       {step === 3 && (
         <div className="space-y-6">
           <div>
             <h2 className="text-lg font-medium text-foreground">
-              Some thoughts for you
+              How long has this been going on?
             </h2>
             <p className="mt-1 text-sm text-muted">
-              This is supportive guidance, not a diagnosis or medical advice.
+              A rough sense of timing is enough.
             </p>
           </div>
-          <div className="space-y-4">
-            {guidance.map((text, i) => (
-              <Card key={i} padding="md" className="border-l-4 border-l-sage-400">
-                <p className="text-sm leading-relaxed text-foreground">{text}</p>
-              </Card>
+          <div className="grid gap-3 sm:grid-cols-2" role="group" aria-label="Duration">
+            {durationOptions.map((option) => (
+              <CheckInOptionCard
+                key={option.value}
+                label={option.label}
+                selected={duration === option.value}
+                onClick={() => setDuration(option.value)}
+              />
             ))}
           </div>
-          {thoughts && (
-            <Alert variant="info" title="You shared">
-              &ldquo;{thoughts.length > 200 ? thoughts.slice(0, 200) + "..." : thoughts}&rdquo;
-            </Alert>
-          )}
         </div>
       )}
 
-      {/* Step 4: Next steps */}
+      {/* Step 4: Life areas */}
       {step === 4 && (
         <div className="space-y-6">
           <div>
             <h2 className="text-lg font-medium text-foreground">
-              What feels like a manageable next step?
+              What areas of life does this touch?
+            </h2>
+            <p className="mt-1 text-sm text-muted">
+              Optional — choose as many as apply, or skip this step.
+            </p>
+          </div>
+          <div
+            className="grid grid-cols-2 gap-3 sm:grid-cols-3"
+            role="group"
+            aria-label="Life areas (select any that apply)"
+          >
+            {lifeAreaOptions.map((option) => (
+              <CheckInOptionCard
+                key={option.value}
+                label={option.label}
+                selected={lifeAreas.includes(option.value)}
+                onClick={() => toggleLifeArea(option.value)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Step 5: Optional reflection */}
+      {step === 5 && (
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-lg font-medium text-foreground">
+              Anything you&apos;d like to add?
+            </h2>
+            <p className="mt-1 text-sm text-muted">
+              Optional. Write as much or as little as you want.
+            </p>
+          </div>
+          <Textarea
+            aria-label="Additional reflection"
+            placeholder="I've been feeling... lately because..."
+            value={reflection}
+            onChange={(e) => setReflection(e.target.value)}
+            maxLength={MAX_REFLECTION_LENGTH}
+            rows={6}
+          />
+        </div>
+      )}
+
+      {/* Step 6: Support preference */}
+      {step === 6 && (
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-lg font-medium text-foreground">
+              What kind of support would feel helpful?
             </h2>
             <p className="mt-1 text-sm text-muted">
               Pick one — you can always come back and try something else.
             </p>
           </div>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {nextStepOptions.map((option) => (
-              <button
+          <div className="grid gap-3 sm:grid-cols-2" role="group" aria-label="Kind of support">
+            {supportOptions.map((option) => (
+              <CheckInOptionCard
                 key={option.value}
-                onClick={() => setSelectedNextStep(option.value)}
-                className={cn(
-                  "flex items-start gap-4 rounded-xl border-2 p-4 text-left transition-all duration-200",
-                  selectedNextStep === option.value
-                    ? "border-primary bg-primary/5 shadow-sm"
-                    : "border-border bg-card hover:border-primary/30"
-                )}
-              >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-secondary">
-                  <option.icon className="h-5 w-5 text-secondary-foreground" />
-                </div>
-                <div>
-                  <p className="font-medium text-foreground">{option.label}</p>
-                  <p className="mt-0.5 text-sm text-muted">{option.description}</p>
-                </div>
-              </button>
+                label={option.label}
+                description={option.description}
+                icon={option.icon}
+                selected={support === option.value}
+                onClick={() => setSupport(option.value)}
+              />
             ))}
           </div>
-
-          {selectedNextStep === "reach-out" && (
-            <Card padding="md" className="bg-sage-100/60">
-              <h3 className="mb-2 font-medium text-foreground">
-                Reach-out starter
-              </h3>
-              <p className="text-sm leading-relaxed text-muted">
-                &ldquo;Hey, I&apos;ve been going through something and could use someone
-                to talk to. I&apos;m not looking for advice — just someone to listen.
-                Do you have a few minutes?&rdquo;
-              </p>
-            </Card>
-          )}
         </div>
+      )}
+
+      {step === TOTAL_STEPS && submitError && (
+        <Alert variant="error" title="Something went wrong" className="mt-8">
+          {submitError}
+        </Alert>
       )}
 
       {/* Navigation */}
       <div className="mt-10 flex items-center justify-between gap-4">
         {step > 1 ? (
-          <Button variant="ghost" onClick={handleBack}>
+          <Button variant="ghost" onClick={handleBack} disabled={isSubmitting}>
             <ArrowLeft className="h-4 w-4" />
             Back
           </Button>
@@ -256,29 +328,24 @@ export function CheckInFlow() {
           <div />
         )}
 
-        {step < 4 ? (
-          <Button
-            onClick={handleNext}
-            disabled={!canProceed || isLoading}
-            loading={isLoading}
-          >
-            Continue
-            <ArrowRight className="h-4 w-4" />
-          </Button>
-        ) : (
-          <Button
-            href={
-              selectedNextStep === "resources"
-                ? "/resources"
-                : selectedNextStep === "reach-out"
-                  ? "/how-it-works#reach-out"
-                  : "/"
-            }
-            disabled={!selectedNextStep}
-          >
-            Finish check-in
-          </Button>
-        )}
+        <div className="flex items-center gap-3">
+          {showSkip && (
+            <Button variant="ghost" onClick={handleSkip}>
+              Skip
+            </Button>
+          )}
+
+          {step < TOTAL_STEPS ? (
+            <Button onClick={goNext} disabled={!canContinue}>
+              Continue
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          ) : (
+            <Button onClick={handleFinish} disabled={!support || isSubmitting} loading={isSubmitting}>
+              {isSubmitting ? "Submitting..." : "Finish check-in"}
+            </Button>
+          )}
+        </div>
       </div>
     </PageContainer>
   );

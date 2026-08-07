@@ -6,7 +6,7 @@
   --warm-100: #f5f0ea;
   --warm-200: #ede3d8;
   --warm-400: #c7b39b;
-  --warm-600: #8a7057;
+  --warm-600: #826952; /* darkened from #8a7057 for 4.5:1 contrast on warm-50/100 */
   --warm-900: #2b2420;
 
   /* Sage — calm, growth, secondary actions & success */
@@ -14,7 +14,7 @@
   --sage-200: #cadbce;
   --sage-400: #98b6a2;
   --sage-500: #7b9e89;
-  --sage-600: #63866f;
+  --sage-600: #5d7e68; /* darkened from #63866f so white button text meets 4.5:1 */
   --sage-800: #3b5342;
 
   /* Semantic tokens */
@@ -33,6 +33,22 @@
   --destructive: #dc2626;
   --ring: var(--sage-500);
   --radius: 0.75rem;
+}
+
+.dark {
+  --background: #1c1815;
+  --foreground: var(--warm-100);
+  --muted: var(--warm-400);
+  --border: #35302a;
+  --card: #242019;
+  --primary: var(--sage-500);
+  --primary-hover: var(--sage-400);
+  --primary-foreground: var(--warm-900);
+  --secondary: var(--sage-800);
+  --secondary-foreground: var(--sage-100);
+  --accent-sage: var(--sage-400);
+  --accent-sage-light: var(--sage-800);
+  --ring: var(--sage-400);
 }
 
 @theme inline {
@@ -89,4 +105,19 @@ body {
 :focus-visible {
   outline: 2px solid var(--ring);
   outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

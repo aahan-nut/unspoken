@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/Card";
 import { Disclaimer } from "@/components/ui/Disclaimer";
-import { features, howItWorksSteps, privacyPoints } from "@/lib/mock-data";
+import { features, howItWorksSteps, privacyPoints } from "@/data/siteContent";
 import {
   ArrowRight,
   ChevronRight,
@@ -105,6 +105,15 @@ export default function HomePage() {
                 <CardDescription>{feature.description}</CardDescription>
               </Card>
             ))}
+          </div>
+          <div className="mt-10 text-center">
+            <Link
+              href="/help-me-say-it"
+              className="inline-flex items-center gap-1 text-sm font-medium text-primary transition-colors hover:text-primary-hover"
+            >
+              Try the Help Me Say It tool
+              <ChevronRight className="h-4 w-4" />
+            </Link>
           </div>
         </PageContainer>
       </section>
