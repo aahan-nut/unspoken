@@ -1,8 +1,5 @@
 import { AppShell } from "@/components/layout/AppShell";
-import {
-  PageContainer,
-  SectionHeading,
-} from "@/components/layout/PageContainer";
+import { PageContainer } from "@/components/layout/PageContainer";
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { Card, CardDescription } from "@/components/ui/Card";
@@ -32,7 +29,7 @@ const privacySections = [
     id: "future-storage",
     title: "What information may eventually be stored",
     content:
-      "If accounts are introduced, we intend to store only what's needed to make the product useful: your check-in responses, saved resources with their status and notes, and basic preferences like your theme. We do not intend to store precise location, government ID, or health records.",
+      "If accounts are introduced, we intend to store only what's needed to make the product useful: your check-in responses, saved resources with their status and notes, and basic preferences. We do not intend to store precise location, government ID, or health records.",
   },
   {
     id: "minimal-collection",
@@ -80,13 +77,14 @@ const privacySections = [
 
 export default function PrivacyPage() {
   return (
-    <AppShell>
+    <AppShell
+      intro={{
+        eyebrow: "Privacy",
+        title: "Privacy & safety",
+        description: "How we approach your privacy, data, and safety on Unspoken.",
+      }}
+    >
       <PageContainer narrow>
-        <SectionHeading
-          level="h1"
-          title="Privacy & safety"
-          description="How we approach your privacy, data, and safety on Unspoken."
-        />
 
         <Disclaimer className="mb-10" />
 

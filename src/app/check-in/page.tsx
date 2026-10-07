@@ -10,7 +10,13 @@ export const metadata: Metadata = {
 
 export default function CheckInPage() {
   return (
-    <AppShell>
+    <AppShell
+      intro={{
+        title: "Check in with yourself",
+        description: "Take your time. There are no wrong answers here.",
+        back: { href: "/", label: "Back to home" },
+      }}
+    >
       <CheckInFlow />
     </AppShell>
   );

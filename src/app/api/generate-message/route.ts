@@ -36,7 +36,7 @@ export async function POST(request: Request) {
     const result = await generateSupportiveMessage(parsed.data);
     return NextResponse.json(result);
   } catch (error) {
-    console.error("generate-message failed:", error);
+    console.error("generate-message failed:", error instanceof Error ? error.message : "unknown error");
     return NextResponse.json(
       { error: "Something went wrong generating your message. Please try again." },
       { status: 500 }

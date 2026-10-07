@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { absoluteUrl } from "@/lib/siteUrl";
 import { redirect } from "next/navigation";
 
 export interface AuthActionState {
@@ -54,7 +55,11 @@ export async function signup(
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signUp({ email, password });
+  const { error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: { emailRedirectTo: absoluteUrl("/login") },
+  });
 
   if (error) {
     return { error: error.message, success: false };

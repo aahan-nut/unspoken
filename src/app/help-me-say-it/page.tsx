@@ -10,7 +10,14 @@ export const metadata: Metadata = {
 
 export default function HelpMeSayItPage() {
   return (
-    <AppShell>
+    <AppShell
+      intro={{
+        title: "Help Me Say It",
+        description:
+          "Not knowing how to start the conversation is one of the biggest barriers to getting support. Let's draft a starting point together.",
+        back: { href: "/support", label: "Back" },
+      }}
+    >
       <SayItFlow />
     </AppShell>
   );

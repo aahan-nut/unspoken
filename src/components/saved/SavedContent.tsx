@@ -1,6 +1,6 @@
 "use client";
 
-import { PageContainer, SectionHeading } from "@/components/layout/PageContainer";
+import { PageContainer } from "@/components/layout/PageContainer";
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -9,10 +9,13 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { FieldWrapper, Select, Textarea } from "@/components/ui/FormField";
 import { useToast } from "@/components/ui/Toast";
 import { resources, savedStatusOptions } from "@/data/mockResources";
+import { parentResources } from "@/data/parentSupport/resources";
 import { createClient } from "@/lib/supabase/client";
+import { SAVED_RESOURCE_COLUMNS } from "@/lib/supabase/savedResourceColumns";
 import { findLabel } from "@/lib/utils";
 import type { SavedResourceRow, SavedStatus } from "@/types/resource";
 import {
+  BadgeCheck,
   Bookmark,
   Check,
   Copy,
@@ -51,7 +54,7 @@ export function SavedContent({ initialEntries, initialError = null }: SavedConte
       .from("saved_resources")
       .update({ status })
       .eq("id", id)
-      .select("id, resource_id, status, private_notes, created_at, updated_at")
+      .select(SAVED_RESOURCE_COLUMNS)
       .single();
 
     if (error) {
@@ -114,7 +117,7 @@ export function SavedContent({ initialEntries, initialError = null }: SavedConte
     entry: SavedResourceRow;
     title: string;
     description: string;
-    isExternal: boolean;
+    badge: "nearby" | "curated" | null;
     phone?: string;
     url?: string;
     mapsUrl?: string | null;
@@ -127,8 +130,22 @@ export function SavedContent({ initialEntries, initialError = null }: SavedConte
           entry,
           title: entry.external_name ?? "Saved listing",
           description: entry.external_address ?? "No address on file.",
-          isExternal: true,
+          badge: "nearby",
           mapsUrl: entry.external_maps_url,
+        },
+      ];
+    }
+
+    if (entry.source === "parent_curated") {
+      const parentResource = parentResources.find((r) => r.id === entry.external_place_id);
+      return [
+        {
+          entry,
+          title: parentResource?.title ?? entry.external_name ?? "Saved listing",
+          description: parentResource?.description ?? entry.external_address ?? "",
+          badge: "curated",
+          phone: parentResource?.phone,
+          url: parentResource?.websiteUrl,
         },
       ];
     }
@@ -141,7 +158,7 @@ export function SavedContent({ initialEntries, initialError = null }: SavedConte
         entry,
         title: resource.title,
         description: resource.description,
-        isExternal: false,
+        badge: null,
         phone: resource.phone,
         url: resource.url,
       },
@@ -150,12 +167,6 @@ export function SavedContent({ initialEntries, initialError = null }: SavedConte
 
   return (
     <PageContainer narrow>
-      <SectionHeading
-        level="h1"
-        title="Saved resources"
-        description="Resources you've saved, plus your own status and private notes."
-      />
-
       {errorMessage && (
         <Alert variant="error" title="Something went wrong" className="mb-6">
           {errorMessage}
@@ -172,16 +183,22 @@ export function SavedContent({ initialEntries, initialError = null }: SavedConte
         />
       ) : (
         <div className="space-y-5">
-          {rows.map(({ entry, title, description, isExternal, phone, url, mapsUrl }) => (
+          {rows.map(({ entry, title, description, badge, phone, url, mapsUrl }) => (
             <Card key={entry.id} padding="md">
               <div className="mb-4 flex items-start justify-between gap-3">
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
                     <h2 className="text-base font-semibold text-foreground">{title}</h2>
-                    {isExternal && (
+                    {badge === "nearby" && (
                       <span className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-2 py-0.5 text-xs font-medium text-muted">
                         <MapPin className="h-3 w-3" />
                         Nearby listing
+                      </span>
+                    )}
+                    {badge === "curated" && (
+                      <span className="inline-flex items-center gap-1 rounded-full border border-sky-200 bg-sky-100 px-2 py-0.5 text-xs font-medium text-sky-800">
+                        <BadgeCheck className="h-3 w-3" />
+                        Curated resource
                       </span>
                     )}
                   </div>
@@ -268,14 +285,14 @@ export function SavedContent({ initialEntries, initialError = null }: SavedConte
                     <ExternalLink className="h-3.5 w-3.5" />
                   </Button>
                 )}
-                {isExternal && mapsUrl && (
+                {badge === "nearby" && mapsUrl && (
                   <Button variant="outline" size="sm" href={mapsUrl}>
                     View on Google Maps
                     <ExternalLink className="h-3.5 w-3.5" />
                   </Button>
                 )}
               </div>
-              {isExternal && (
+              {badge === "nearby" && (
                 <p className="mt-3 text-xs text-muted/80">
                   Contact provider directly to confirm cost, insurance, and eligibility.
                 </p>

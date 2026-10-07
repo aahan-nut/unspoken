@@ -44,13 +44,14 @@ export type SavedStatus =
   | "appointment"
   | "not-a-fit";
 
-export type SavedResourceSource = "internal" | "google_places";
+export type SavedResourceSource = "internal" | "google_places" | "parent_curated";
 
 /**
  * Mirrors a row of the `saved_resources` Supabase table (see
- * supabase/migrations/0001_init.sql and 0002_external_saved_resources.sql).
- * A row is either an internal curated resource (resource_id set) or a live
- * Google Places save (external_* fields set) — never both.
+ * supabase/migrations/0001_init.sql, 0002_external_saved_resources.sql, and
+ * 0003_parent_curated_saves.sql). A row is either an internal curated teen
+ * resource (resource_id set), a live Google Places save, or a curated Parent
+ * Support resource (the latter two use the external_* fields) — never both.
  */
 export interface SavedResourceRow {
   id: string;

@@ -17,17 +17,14 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const { redirectedFrom } = await searchParams;
 
   return (
-    <AppShell>
+    <AppShell
+      intro={{
+        title: "Welcome back",
+        description: "Log in to save resources and pick up where you left off.",
+      }}
+    >
       <PageContainer narrow>
         <div className="mx-auto max-w-sm">
-          <div className="mb-8 text-center">
-            <h1 className="text-2xl font-semibold text-foreground sm:text-3xl">
-              Welcome back
-            </h1>
-            <p className="mt-2 text-muted">
-              Log in to save resources and pick up where you left off.
-            </p>
-          </div>
           <Card padding="lg">
             <LoginForm redirectedFrom={redirectedFrom} />
           </Card>

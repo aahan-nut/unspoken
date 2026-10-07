@@ -28,10 +28,10 @@ const typeIcons = {
 
 const categoryColors: Record<Resource["category"], string> = {
   crisis: "bg-red-50 text-red-700 border-red-100",
-  counseling: "bg-sage-100 text-sage-800 border-sage-200",
-  peer: "bg-warm-100 text-sage-600 border-warm-200",
-  education: "bg-warm-200/60 text-warm-900 border-warm-200",
-  "self-care": "bg-sage-100 text-sage-600 border-sage-200",
+  counseling: "bg-sky-100 text-sky-800 border-sky-200",
+  peer: "bg-mist text-sky-600 border-sky-200",
+  education: "bg-card text-ink border-border",
+  "self-care": "bg-sky-100 text-sky-600 border-sky-200",
 };
 
 const modalityLabel: Record<Resource["modality"], string> = {
@@ -74,7 +74,7 @@ export function ResourceCard({
     <Card hover className={cn("flex flex-col", className)}>
       <div className="mb-4 flex items-start justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-secondary">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary">
             <TypeIcon className="h-4 w-4 text-secondary-foreground" />
           </div>
           <span

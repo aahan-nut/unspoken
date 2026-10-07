@@ -13,8 +13,7 @@ import { clearSupportResult, loadSupportResult } from "@/lib/sessionState";
 import { intensityQualifiers, supportResponses } from "@/data/mockSupportResponses";
 import type { CheckInResponses } from "@/types/checkIn";
 import { useClientValue } from "@/lib/useClientValue";
-import { ArrowLeft, HeartHandshake, MessageSquareText, Phone } from "lucide-react";
-import Link from "next/link";
+import { HeartHandshake, MessageSquareText, Phone } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export function SupportContent() {
@@ -80,23 +79,11 @@ export function SupportContent() {
 
   return (
     <PageContainer narrow>
-      <div className="mb-8">
-        <Link
-          href="/check-in"
-          className="mb-6 inline-flex items-center gap-1 text-sm text-muted transition-colors hover:text-foreground"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to check-in
-        </Link>
-        <h1 className="text-2xl font-semibold text-foreground sm:text-3xl">
-          Here&apos;s what we heard
-        </h1>
-        <p className="mt-2 text-muted">
-          {payload
-            ? "A supportive response based on what you shared."
-            : "A mock, non-diagnostic response based on what you shared."}
-        </p>
-      </div>
+      <p className="mb-8 text-[17px] text-muted">
+        {payload
+          ? "A supportive response based on what you shared."
+          : "A mock, non-diagnostic response based on what you shared."}
+      </p>
 
       <Alert variant="error" title="In immediate danger or crisis?" className="mb-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -119,7 +106,7 @@ export function SupportContent() {
 
       <SupportSummaryCard responses={responses} />
 
-      <Card padding="md" className="mb-6 border-l-4 border-l-sage-400">
+      <Card padding="md" className="mb-6 border-l-4 border-l-sky-400">
         <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted">
           A thought for you
         </h2>

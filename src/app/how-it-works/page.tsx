@@ -60,7 +60,7 @@ function JourneyStepCard({ step }: { step: JourneyStep }) {
   const content = (
     <Card hover={Boolean(step.href)} padding="md" className="flex h-full flex-col">
       <div className="mb-3 flex items-center gap-3">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary text-sm font-bold text-primary-foreground">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
           {step.step}
         </div>
         <step.icon className="h-5 w-5 text-muted" aria-hidden="true" />
@@ -81,13 +81,15 @@ function JourneyStepCard({ step }: { step: JourneyStep }) {
 
 export default function HowItWorksPage() {
   return (
-    <AppShell>
+    <AppShell
+      intro={{
+        eyebrow: "How it works",
+        title: "How Unspoken works",
+        description:
+          "A calm, step-by-step approach to understanding what you're feeling and finding your next step.",
+      }}
+    >
       <PageContainer>
-        <SectionHeading
-          level="h1"
-          title="How Unspoken works"
-          description="A calm, step-by-step approach to understanding what you're feeling and finding your next step."
-        />
 
         <Disclaimer className="mb-12" />
 
@@ -112,7 +114,7 @@ export default function HowItWorksPage() {
         <div className="mb-16 grid gap-6 sm:grid-cols-2">
           {principles.map((principle) => (
             <Card key={principle.title}>
-              <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-secondary">
+              <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-full bg-secondary">
                 <principle.icon className="h-5 w-5 text-secondary-foreground" />
               </div>
               <CardHeader>

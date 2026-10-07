@@ -1,181 +1,154 @@
-import { AppShell } from "@/components/layout/AppShell";
-import {
-  PageContainer,
-  SectionHeading,
-} from "@/components/layout/PageContainer";
-import { Button } from "@/components/ui/Button";
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/Card";
-import { Disclaimer } from "@/components/ui/Disclaimer";
+import { HomeHero } from "@/components/home/HomeHero";
+import { Footer } from "@/components/layout/Footer";
+import { ArrowLink, Panel, SectionIntro } from "@/components/layout/Panel";
+import { pillBase, pillClasses } from "@/components/layout/surface";
+import { DisclaimerText } from "@/components/ui/Disclaimer";
 import { features, howItWorksSteps, privacyPoints } from "@/data/siteContent";
-import {
-  ArrowRight,
-  ChevronRight,
-  Shield,
-} from "lucide-react";
+import { createClient } from "@/lib/supabase/server";
+import { cn } from "@/lib/utils";
+import { ArrowRight, Info } from "lucide-react";
 import Link from "next/link";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // The hero carries its own header and crisis links, so the home page skips
+  // AppShell's navbar and crisis banner and lays everything on the slate frame.
   return (
-    <AppShell>
-      {/* Hero */}
-      <section className="relative overflow-hidden border-b border-border bg-gradient-to-b from-warm-100 to-background">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-sage-100/80 via-transparent to-transparent" />
-        <PageContainer className="relative py-16 sm:py-24">
-          <div className="mx-auto max-w-3xl text-center">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-1.5 text-sm text-muted shadow-sm">
-              <Shield className="h-4 w-4 text-sage-600" />
-              Private, supportive, and free to explore
-            </div>
-            <h1 className="text-4xl font-semibold leading-tight tracking-tight text-foreground sm:text-5xl lg:text-[3.25rem]">
-              Finding the words can be the hardest part.
-            </h1>
-            <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted">
-              Unspoken helps you reflect on what you are feeling, identify a
-              manageable next step, and prepare to reach out to someone you
-              trust.
-            </p>
-            <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Button size="lg" href="/check-in">
-                Start a Check-In
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-              <Button variant="outline" size="lg" href="/resources">
-                Find Support
-              </Button>
-            </div>
-          </div>
-        </PageContainer>
-      </section>
+    <>
+      <main className="flex flex-1 flex-col gap-(--frame-gap) bg-frame p-(--frame-gap)">
+        <HomeHero user={user ? { email: user.email ?? "" } : null} />
 
-      {/* How it works preview */}
-      <section className="border-b border-border bg-card">
-        <PageContainer className="py-16 sm:py-20">
-          <SectionHeading
-            title="How Unspoken works"
-            description="Three simple steps to help you understand what you're feeling and decide what to do next."
-            centered
-          />
-          <div className="grid gap-6 md:grid-cols-3">
+        {/* How it works */}
+        <Panel tone="mist" id="how-it-works" className="scroll-mt-(--frame-gap)">
+          <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+            <SectionIntro
+              eyebrow="Three steps"
+              title="How Unspoken works"
+              description="Three simple steps to help you understand what you're feeling and decide what to do next."
+            />
+            <ArrowLink href="/how-it-works">Learn more</ArrowLink>
+          </div>
+          <ol className="mt-[clamp(40px,5vw,72px)] grid gap-10 md:grid-cols-3 md:gap-[clamp(24px,3vw,48px)]">
             {howItWorksSteps.map((step) => (
-              <Card key={step.step} hover className="relative">
-                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-sage-100 text-sm font-bold text-sage-600">
-                  {step.step}
-                </div>
-                <CardHeader>
-                  <CardTitle>{step.title}</CardTitle>
-                </CardHeader>
-                <CardDescription>{step.description}</CardDescription>
-              </Card>
+              <li key={step.step} className="border-t border-ink/20 pt-6">
+                <span className="text-[15px] font-medium tracking-[0.08em] text-ink-muted">
+                  {String(step.step).padStart(2, "0")}
+                </span>
+                <h3 className="mt-5 text-[21px] font-semibold leading-snug">
+                  {step.title}
+                </h3>
+                <p className="mt-3 text-[16px] leading-[1.6] text-ink-muted">
+                  {step.description}
+                </p>
+              </li>
             ))}
-          </div>
-          <div className="mt-10 text-center">
-            <Link
-              href="/how-it-works"
-              className="inline-flex items-center gap-1 text-sm font-medium text-primary transition-colors hover:text-primary-hover"
-            >
-              Learn more about how it works
-              <ChevronRight className="h-4 w-4" />
-            </Link>
-          </div>
-        </PageContainer>
-      </section>
+          </ol>
+        </Panel>
 
-      {/* Feature cards */}
-      <section className="border-b border-border">
-        <PageContainer className="py-16 sm:py-20">
-          <SectionHeading
-            title="Support that meets you where you are"
-            description="Tools designed for reflection, not diagnosis — helping you take the next step that feels right."
-            centered
-          />
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Features */}
+        <Panel tone="mist">
+          <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+            <SectionIntro
+              eyebrow="What you can do here"
+              title="Support that meets you where you are"
+              description="Tools designed for reflection, not diagnosis — helping you take the next step that feels right."
+            />
+            <ArrowLink href="/help-me-say-it">Try Help Me Say It</ArrowLink>
+          </div>
+          <div className="mt-[clamp(40px,5vw,72px)] grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
             {features.map((feature) => (
-              <Card key={feature.title} hover>
-                <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-secondary">
-                  <feature.icon className="h-5 w-5 text-secondary-foreground" />
+              <div
+                key={feature.title}
+                className="rounded-[20px] bg-white/75 p-7 ring-1 ring-ink/5"
+              >
+                <div className="flex h-12 w-12 items-center justify-center rounded-full border border-ink/20">
+                  <feature.icon className="h-5 w-5" strokeWidth={1.6} aria-hidden="true" />
                 </div>
-                <CardHeader>
-                  <CardTitle>{feature.title}</CardTitle>
-                </CardHeader>
-                <CardDescription>{feature.description}</CardDescription>
-              </Card>
+                <h3 className="mt-6 text-[19px] font-semibold leading-snug">
+                  {feature.title}
+                </h3>
+                <p className="mt-2.5 text-[15.5px] leading-[1.6] text-ink-muted">
+                  {feature.description}
+                </p>
+              </div>
             ))}
           </div>
-          <div className="mt-10 text-center">
-            <Link
-              href="/help-me-say-it"
-              className="inline-flex items-center gap-1 text-sm font-medium text-primary transition-colors hover:text-primary-hover"
-            >
-              Try the Help Me Say It tool
-              <ChevronRight className="h-4 w-4" />
-            </Link>
-          </div>
-        </PageContainer>
-      </section>
+        </Panel>
 
-      {/* Disclaimer */}
-      <section>
-        <PageContainer className="py-12">
-          <Disclaimer />
-        </PageContainer>
-      </section>
-
-      {/* Privacy section */}
-      <section className="border-y border-border bg-card">
-        <PageContainer className="py-16 sm:py-20">
-          <SectionHeading
-            title="Your privacy matters"
-            description="Use Unspoken on your terms — no account required, and you're always in control of what you share."
-            centered
-          />
-          <div className="grid gap-6 md:grid-cols-3">
-            {privacyPoints.map((point) => (
-              <Card key={point.title}>
-                <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-sage-100">
-                  <point.icon className="h-5 w-5 text-sage-600" />
-                </div>
-                <CardHeader>
-                  <CardTitle>{point.title}</CardTitle>
-                </CardHeader>
-                <CardDescription>{point.description}</CardDescription>
-              </Card>
-            ))}
+        {/* Privacy + disclaimer */}
+        <Panel tone="ink">
+          <div className="grid gap-12 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-[clamp(48px,6vw,112px)]">
+            <div>
+              <SectionIntro
+                light
+                eyebrow="Privacy"
+                title="Your privacy matters"
+                description="Use Unspoken on your terms — no account required, and you're always in control of what you share."
+              />
+              <Link
+                href="/privacy"
+                className={cn(pillBase, pillClasses.outlineLight, "mt-8")}
+              >
+                Read our privacy approach
+              </Link>
+            </div>
+            <ul className="divide-y divide-white/15">
+              {privacyPoints.map((point) => (
+                <li key={point.title} className="flex gap-5 py-6 first:pt-0 last:pb-0">
+                  <div className="flex h-12 w-12 flex-none items-center justify-center rounded-full border border-white/30">
+                    <point.icon className="h-5 w-5" strokeWidth={1.6} aria-hidden="true" />
+                  </div>
+                  <div>
+                    <h3 className="text-[19px] font-semibold leading-snug">
+                      {point.title}
+                    </h3>
+                    <p className="mt-2 text-[16px] leading-[1.6] text-white/80">
+                      {point.description}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
           </div>
-          <div className="mt-10 text-center">
-            <Button variant="secondary" href="/privacy">
-              Read our privacy approach
-            </Button>
-          </div>
-        </PageContainer>
-      </section>
 
-      {/* CTA */}
-      <section>
-        <PageContainer className="py-16 sm:py-20">
-          <div className="rounded-3xl border border-border bg-gradient-to-br from-sage-100/50 via-warm-100 to-warm-50 p-8 text-center sm:p-12">
-            <h2 className="text-2xl font-semibold text-foreground sm:text-3xl">
-              Ready when you are
-            </h2>
-            <p className="mx-auto mt-3 max-w-lg text-muted">
-              There&apos;s no pressure and no wrong way to start. Take a moment
-              for yourself — whenever it feels right.
-            </p>
-            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Button size="lg" href="/check-in">
-                Start a Check-In
-              </Button>
-              <Button variant="ghost" size="lg" href="/resources">
-                Browse resources
-              </Button>
+          <div className="mt-[clamp(48px,6vw,80px)] flex gap-4 rounded-[20px] border border-white/15 bg-white/[0.05] p-6">
+            <Info className="mt-0.5 h-5 w-5 flex-none" strokeWidth={1.6} aria-hidden="true" />
+            <div>
+              <p className="text-[13px] font-medium uppercase tracking-[0.08em] text-white/80">
+                Important to know
+              </p>
+              <p className="mt-2 text-[15px] leading-[1.6] text-white/90">
+                <DisclaimerText />
+              </p>
             </div>
           </div>
-        </PageContainer>
-      </section>
-    </AppShell>
+        </Panel>
+
+        {/* Closing call to action — reprises the hero gradient */}
+        <Panel tone="hero" className="py-[clamp(72px,9vw,140px)]">
+          <SectionIntro
+            light
+            centered
+            eyebrow="No pressure"
+            title="Ready when you are"
+            description="There's no wrong way to start. Take a moment for yourself — whenever it feels right."
+          />
+          <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Link href="/check-in" className={cn(pillBase, pillClasses.solidLight)}>
+              Start a check-in
+              <ArrowRight className="h-4 w-4 flex-none" strokeWidth={1.8} aria-hidden="true" />
+            </Link>
+            <Link href="/resources" className={cn(pillBase, pillClasses.outlineLight)}>
+              Browse resources
+            </Link>
+          </div>
+        </Panel>
+      </main>
+      <Footer />
+    </>
   );
 }

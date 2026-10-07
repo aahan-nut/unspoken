@@ -5,20 +5,19 @@ import { Compass } from "lucide-react";
 
 export default function NotFound() {
   return (
-    <AppShell>
+    <AppShell
+      intro={{
+        title: "Page not found",
+        description:
+          "The page you're looking for doesn't exist or may have been moved. Let's get you back on track.",
+      }}
+    >
       <PageContainer>
-        <div className="flex flex-col items-center justify-center py-24 text-center">
-          <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-secondary">
-            <Compass className="h-8 w-8 text-secondary-foreground" />
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <div className="mb-8 flex h-16 w-16 items-center justify-center rounded-full bg-secondary">
+            <Compass className="h-8 w-8 text-secondary-foreground" aria-hidden="true" />
           </div>
-          <h1 className="text-2xl font-semibold text-foreground">
-            Page not found
-          </h1>
-          <p className="mt-3 max-w-md text-muted">
-            The page you&apos;re looking for doesn&apos;t exist or may have been
-            moved. Let&apos;s get you back on track.
-          </p>
-          <div className="mt-8 flex gap-3">
+          <div className="flex flex-wrap justify-center gap-3">
             <Button href="/">Go home</Button>
             <Button variant="outline" href="/check-in">
               Start a check-in

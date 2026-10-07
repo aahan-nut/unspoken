@@ -15,21 +15,17 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantStyles: Record<ButtonVariant, string> = {
-  primary:
-    "bg-primary text-primary-foreground hover:bg-primary-hover shadow-sm",
-  secondary:
-    "bg-secondary text-secondary-foreground hover:bg-sage-200",
-  ghost: "bg-transparent text-foreground hover:bg-black/5",
-  outline:
-    "border border-border bg-card text-foreground hover:bg-background",
-  destructive:
-    "bg-destructive text-white hover:bg-red-700 shadow-sm",
+  primary: "bg-primary text-primary-foreground hover:bg-primary-hover",
+  secondary: "bg-secondary text-secondary-foreground hover:bg-sky-200",
+  ghost: "bg-transparent text-foreground hover:bg-ink/5",
+  outline: "border border-ink/25 bg-transparent text-foreground hover:bg-ink/5",
+  destructive: "bg-destructive text-white hover:bg-red-700",
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
-  sm: "h-9 px-3.5 text-sm gap-1.5",
-  md: "h-11 px-5 text-sm gap-2",
-  lg: "h-12 px-6 text-base gap-2",
+  sm: "h-9 px-4 text-[12px] gap-1.5",
+  md: "h-11 px-6 text-[13px] gap-2",
+  lg: "h-[52px] px-7 text-[14px] gap-2.5",
 };
 
 export function Button({
@@ -44,7 +40,8 @@ export function Button({
   ...props
 }: ButtonProps) {
   const classes = cn(
-    "inline-flex items-center justify-center rounded-xl font-medium transition-colors duration-200",
+    // Pill buttons with tracked uppercase labels, from the Unspoken Hero design.
+    "inline-flex items-center justify-center rounded-full font-semibold uppercase tracking-[0.08em] transition-colors duration-200",
     "disabled:opacity-50 disabled:pointer-events-none",
     variantStyles[variant],
     sizeStyles[size],

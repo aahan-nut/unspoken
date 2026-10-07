@@ -1,6 +1,6 @@
 "use client";
 
-import { PageContainer, SectionHeading } from "@/components/layout/PageContainer";
+import { PageContainer } from "@/components/layout/PageContainer";
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -14,15 +14,11 @@ import {
   type ResourceFilterState,
 } from "@/components/resources/ResourceFilters";
 import { NearbySearch } from "@/components/resources/NearbySearch";
-import { useToast } from "@/components/ui/Toast";
 import { resourceSortOptions, resources } from "@/data/mockResources";
-import { SAVED_RESOURCE_COLUMNS } from "@/lib/supabase/savedResourceColumns";
-import { createClient } from "@/lib/supabase/client";
+import { useSavedResources } from "@/lib/useSavedResources";
 import type { ResourceSort, SavedResourceRow } from "@/types/resource";
-import type { NearbyResource } from "@/types/geo";
 import { Bookmark, Search, SlidersHorizontal } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 const FREE_COST_CATEGORIES = new Set(["free", "low-cost", "sliding-scale"]);
@@ -36,27 +32,26 @@ export function ResourcesContent({
   initialSavedEntries,
   isAuthenticated,
 }: ResourcesContentProps) {
-  const router = useRouter();
-  const { showToast } = useToast();
-  const supabase = useMemo(() => createClient(), []);
-
   const [search, setSearch] = useState("");
   const [filters, setFilters] = useState<ResourceFilterState>(defaultResourceFilters);
   const [sort, setSort] = useState<ResourceSort>("relevance");
-  const [savedEntries, setSavedEntries] = useState<SavedResourceRow[]>(initialSavedEntries);
-  const [savingId, setSavingId] = useState<string | null>(null);
-  const [savingExternalId, setSavingExternalId] = useState<string | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [savedOnly, setSavedOnly] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
-  const isResourceSaved = (resourceId: string) =>
-    savedEntries.some((entry) => entry.resource_id === resourceId);
-
-  const isPlaceSaved = (externalId: string) =>
-    savedEntries.some(
-      (entry) => entry.source === "google_places" && entry.external_place_id === externalId
-    );
+  const {
+    savedEntries,
+    savingId,
+    savingExternalId,
+    errorMessage,
+    isResourceSaved,
+    isPlaceSaved,
+    handleToggleSave,
+    handleToggleSaveExternal,
+  } = useSavedResources({
+    initialSavedEntries,
+    isAuthenticated,
+    loginRedirectPath: "/resources",
+  });
 
   const handleFilterChange = (patch: Partial<ResourceFilterState>) => {
     setFilters((prev) => ({ ...prev, ...patch }));
@@ -66,100 +61,6 @@ export function ResourcesContent({
     setFilters(defaultResourceFilters);
     setSearch("");
     setSavedOnly(false);
-  };
-
-  const handleToggleSave = async (resourceId: string) => {
-    if (!isAuthenticated) {
-      router.push(`/login?redirectedFrom=${encodeURIComponent("/resources")}`);
-      return;
-    }
-
-    setErrorMessage(null);
-    setSavingId(resourceId);
-
-    const existing = savedEntries.find((entry) => entry.resource_id === resourceId);
-
-    if (existing) {
-      const { error } = await supabase.from("saved_resources").delete().eq("id", existing.id);
-      if (error) {
-        setErrorMessage("Couldn't remove this resource. Please try again.");
-      } else {
-        setSavedEntries((prev) => prev.filter((entry) => entry.id !== existing.id));
-        showToast("Removed from saved resources");
-      }
-    } else {
-      const { data, error } = await supabase
-        .from("saved_resources")
-        .insert({ resource_id: resourceId })
-        .select(SAVED_RESOURCE_COLUMNS)
-        .single();
-
-      if (error) {
-        if (error.code === "23505") {
-          // Unique-violation — a duplicate insert slipped through (e.g. a
-          // double-click). It's already saved, so just say so.
-          showToast("Already in your saved resources");
-        } else {
-          setErrorMessage("Couldn't save this resource. Please try again.");
-        }
-      } else if (data) {
-        setSavedEntries((prev) => [...prev, data as SavedResourceRow]);
-        showToast("Saved — find it on your Saved page");
-      }
-    }
-
-    setSavingId(null);
-  };
-
-  const handleToggleSaveExternal = async (place: NearbyResource) => {
-    if (!isAuthenticated) {
-      router.push(`/login?redirectedFrom=${encodeURIComponent("/resources")}`);
-      return;
-    }
-
-    setErrorMessage(null);
-    setSavingExternalId(place.externalId);
-
-    const existing = savedEntries.find(
-      (entry) => entry.source === "google_places" && entry.external_place_id === place.externalId
-    );
-
-    if (existing) {
-      const { error } = await supabase.from("saved_resources").delete().eq("id", existing.id);
-      if (error) {
-        setErrorMessage("Couldn't remove this resource. Please try again.");
-      } else {
-        setSavedEntries((prev) => prev.filter((entry) => entry.id !== existing.id));
-        showToast("Removed from saved resources");
-      }
-    } else {
-      const { data, error } = await supabase
-        .from("saved_resources")
-        .insert({
-          resource_id: null,
-          source: "google_places",
-          external_place_id: place.externalId,
-          external_name: place.name,
-          external_address: place.address,
-          external_resource_type: place.resourceType,
-          external_maps_url: place.googleMapsUrl,
-        })
-        .select(SAVED_RESOURCE_COLUMNS)
-        .single();
-
-      if (error) {
-        if (error.code === "23505") {
-          showToast("Already in your saved resources");
-        } else {
-          setErrorMessage("Couldn't save this resource. Please try again.");
-        }
-      } else if (data) {
-        setSavedEntries((prev) => [...prev, data as SavedResourceRow]);
-        showToast("Saved — find it on your Saved page");
-      }
-    }
-
-    setSavingExternalId(null);
   };
 
   const activeFilterCount = [
@@ -243,12 +144,6 @@ export function ResourcesContent({
 
   return (
     <PageContainer>
-      <SectionHeading
-        level="h1"
-        title="Find support"
-        description="Search mental health resources by location, format, and what matters to you."
-      />
-
       <Alert variant="warning" title="Sample data" className="mb-8">
         This directory uses mock listings built for this frontend prototype. Nothing
         here is clinically verified — always confirm details directly with the

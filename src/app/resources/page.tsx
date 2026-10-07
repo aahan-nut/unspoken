@@ -27,7 +27,13 @@ export default async function ResourcesPage() {
   }
 
   return (
-    <AppShell>
+    <AppShell
+      intro={{
+        title: "Find support",
+        description:
+          "Search mental health resources by location, format, and what matters to you.",
+      }}
+    >
       <ResourcesContent
         initialSavedEntries={initialSavedEntries}
         isAuthenticated={Boolean(user)}

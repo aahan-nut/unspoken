@@ -1,54 +1,37 @@
 @import "tailwindcss";
 
 :root {
-  /* Warm Neutrals — page, surface, text, borders */
-  --warm-50: #fbf8f4;
-  --warm-100: #f5f0ea;
-  --warm-200: #ede3d8;
-  --warm-400: #c7b39b;
-  --warm-600: #826952; /* darkened from #8a7057 for 4.5:1 contrast on warm-50/100 */
-  --warm-900: #2b2420;
+  /* Sky — the hero's blue family; tints, badges and accents */
+  --sky-100: #e3ecf1;
+  --sky-200: #cbdbe4;
+  --sky-400: #8fb0c3;
+  --sky-500: #6f98ad;
+  --sky-600: #3e687e; /* dark enough for 4.5:1 text on sky-100 */
+  --sky-800: #2f4a58;
 
-  /* Sage — calm, growth, secondary actions & success */
-  --sage-100: #e4ece6;
-  --sage-200: #cadbce;
-  --sage-400: #98b6a2;
-  --sage-500: #7b9e89;
-  --sage-600: #5d7e68; /* darkened from #63866f so white button text meets 4.5:1 */
-  --sage-800: #3b5342;
+  /* Surfaces from the Unspoken Hero design */
+  --frame: #3f4a50; /* slate page frame */
+  --ink: #2f4a58; /* primary text and dark panels */
+  --ink-muted: #4d626d;
+  --mist: #eef2f4; /* content panels */
 
   /* Semantic tokens */
-  --background: var(--warm-50);
-  --foreground: var(--warm-900);
-  --muted: var(--warm-600);
-  --border: var(--warm-200);
-  --card: var(--warm-100);
-  --primary: var(--sage-600);
-  --primary-hover: var(--sage-800);
+  --background: var(--mist);
+  --foreground: var(--ink);
+  --muted: var(--ink-muted);
+  --border: #d3dde3;
+  --card: #fbfcfd;
+  --primary: var(--ink);
+  --primary-hover: #223844;
   --primary-foreground: #ffffff;
-  --secondary: var(--sage-100);
-  --secondary-foreground: var(--sage-800);
-  --accent-sage: var(--sage-500);
-  --accent-sage-light: var(--sage-200);
+  --secondary: var(--sky-100);
+  --secondary-foreground: var(--ink);
   --destructive: #dc2626;
-  --ring: var(--sage-500);
+  --ring: var(--sky-600);
   --radius: 0.75rem;
-}
 
-.dark {
-  --background: #1c1815;
-  --foreground: var(--warm-100);
-  --muted: var(--warm-400);
-  --border: #35302a;
-  --card: #242019;
-  --primary: var(--sage-500);
-  --primary-hover: var(--sage-400);
-  --primary-foreground: var(--warm-900);
-  --secondary: var(--sage-800);
-  --secondary-foreground: var(--sage-100);
-  --accent-sage: var(--sage-400);
-  --accent-sage-light: var(--sage-800);
-  --ring: var(--sage-400);
+  /* Slate frame spacing around and between panels */
+  --frame-gap: clamp(8px, 1.6vw, 20px);
 }
 
 @theme inline {
@@ -63,28 +46,55 @@
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
-  --color-accent-sage: var(--accent-sage);
-  --color-accent-sage-light: var(--accent-sage-light);
   --color-destructive: var(--destructive);
   --color-ring: var(--ring);
 
-  /* Warm scale */
-  --color-warm-50: var(--warm-50);
-  --color-warm-100: var(--warm-100);
-  --color-warm-200: var(--warm-200);
-  --color-warm-400: var(--warm-400);
-  --color-warm-600: var(--warm-600);
-  --color-warm-900: var(--warm-900);
+  /* Surfaces */
+  --color-frame: var(--frame);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-mist: var(--mist);
 
-  /* Sage scale */
-  --color-sage-100: var(--sage-100);
-  --color-sage-200: var(--sage-200);
-  --color-sage-400: var(--sage-400);
-  --color-sage-500: var(--sage-500);
-  --color-sage-600: var(--sage-600);
-  --color-sage-800: var(--sage-800);
+  /* Sky scale */
+  --color-sky-100: var(--sky-100);
+  --color-sky-200: var(--sky-200);
+  --color-sky-400: var(--sky-400);
+  --color-sky-500: var(--sky-500);
+  --color-sky-600: var(--sky-600);
+  --color-sky-800: var(--sky-800);
 
-  --font-sans: var(--font-inter);
+  --font-sans: var(--font-instrument-sans);
+}
+
+/*
+ * Hero gradient: the design's default "Custom" tone (hue 230°, warmth 29°),
+ * deepened slightly and edge-shaded so white text stays readable.
+ */
+@utility hero-gradient {
+  background:
+    linear-gradient(
+      to bottom,
+      oklch(0.32 0.04 235 / 0.3),
+      transparent 24%,
+      transparent 76%,
+      oklch(0.32 0.04 235 / 0.3)
+    ),
+    radial-gradient(60% 50% at 30% 30%, oklch(0.67 0.045 230) 0%, transparent 70%),
+    radial-gradient(50% 45% at 72% 62%, oklch(0.66 0.05 259) 0%, transparent 70%),
+    linear-gradient(160deg, oklch(0.58 0.06 230), oklch(0.5 0.06 240));
+}
+
+@utility hero-shadow {
+  text-shadow:
+    0 1px 2px oklch(0.3 0.04 235 / 0.35),
+    0 0 24px oklch(0.3 0.04 235 / 0.3);
+}
+
+/* Mist panels pick up a faint wash of the hero blue along their top edge. */
+@utility mist-glow {
+  background:
+    radial-gradient(70% 60% at 50% 0%, oklch(0.9 0.03 230), transparent 70%),
+    var(--color-mist);
 }
 
 * {
@@ -96,15 +106,21 @@ html {
 }
 
 body {
-  background: var(--background);
+  /* The slate frame shows around every panel and on overscroll. */
+  background: var(--frame);
   color: var(--foreground);
-  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+  font-family: var(--font-instrument-sans), system-ui, -apple-system, sans-serif;
   line-height: 1.6;
 }
 
 :focus-visible {
   outline: 2px solid var(--ring);
   outline-offset: 2px;
+}
+
+/* On the dark and gradient surfaces a white focus ring reads better. */
+:is(.hero-gradient, .bg-ink, .bg-frame) :focus-visible {
+  outline-color: #ffffff;
 }
 
 @media (prefers-reduced-motion: reduce) {

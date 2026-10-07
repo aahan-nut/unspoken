@@ -17,11 +17,11 @@ const variantConfig: Record<
 > = {
   info: {
     icon: Info,
-    styles: "border-sage-200 bg-sage-100 text-sage-800",
+    styles: "border-sky-200 bg-sky-100/70 text-sky-800",
   },
   success: {
     icon: CheckCircle2,
-    styles: "border-sage-400/40 bg-sage-100 text-sage-800",
+    styles: "border-sky-400/40 bg-sky-100 text-sky-800",
   },
   warning: {
     icon: TriangleAlert,
@@ -45,7 +45,7 @@ export function Alert({
     <div
       role="alert"
       className={cn(
-        "flex gap-3 rounded-xl border p-4 text-sm",
+        "flex gap-3 rounded-2xl border p-5 text-[15px]",
         styles,
         className
       )}

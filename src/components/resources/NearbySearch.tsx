@@ -41,17 +41,30 @@ interface NearbySearchProps {
   isPlaceSaved: (externalId: string) => boolean;
   savingExternalId: string | null;
   onToggleSave: (resource: NearbyResource) => void;
+  heading?: string;
+  subheading?: string;
+  categoryOptions?: { value: ResourceCategoryQuery; label: string }[];
+  defaultCategory?: ResourceCategoryQuery;
+  noticeText?: string;
 }
+
+const DEFAULT_NOTICE_TEXT =
+  "Nearby listings are provided using public location data. Unspoken does not guarantee provider availability, cost, eligibility, licensing, or suitability. Contact the organization directly to confirm details.";
 
 export function NearbySearch({
   isPlaceSaved,
   savingExternalId,
   onToggleSave,
+  heading = "Search real places near you",
+  subheading = "Live results from Google — separate from the sample directory below.",
+  categoryOptions = resourceCategoryOptions,
+  defaultCategory = "mental-health",
+  noticeText = DEFAULT_NOTICE_TEXT,
 }: NearbySearchProps) {
   const geo = useGeolocation();
 
   const [radiusMiles, setRadiusMiles] = useState<number>(10);
-  const [category, setCategory] = useState<ResourceCategoryQuery>("mental-health");
+  const [category, setCategory] = useState<ResourceCategoryQuery>(defaultCategory);
   const [manualLocation, setManualLocation] = useState("");
 
   const [searchState, setSearchState] = useState<SearchState>("idle");
@@ -156,14 +169,12 @@ export function NearbySearch({
   return (
     <Card padding="md" className="mb-8">
       <div className="mb-5 flex items-center gap-2.5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-secondary">
+        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary">
           <MapPin className="h-4 w-4 text-secondary-foreground" />
         </div>
         <div>
-          <h2 className="text-base font-semibold text-foreground">Search real places near you</h2>
-          <p className="text-sm text-muted">
-            Live results from Google — separate from the sample directory below.
-          </p>
+          <h2 className="text-base font-semibold text-foreground">{heading}</h2>
+          <p className="text-sm text-muted">{subheading}</p>
         </div>
       </div>
 
@@ -175,7 +186,7 @@ export function NearbySearch({
             onChange={(e) => setCategory(e.target.value as ResourceCategoryQuery)}
             disabled={isSearching}
           >
-            {resourceCategoryOptions.map((option) => (
+            {categoryOptions.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
               </option>
@@ -275,9 +286,7 @@ export function NearbySearch({
       {searchState === "success" && (
         <div className="space-y-5">
           <Alert variant="info" title="About these results">
-            Nearby listings are provided using public location data. Unspoken does not
-            guarantee provider availability, cost, eligibility, licensing, or suitability.
-            Contact the organization directly to confirm details.
+            {noticeText}
           </Alert>
 
           <div className="flex items-center justify-between gap-3">

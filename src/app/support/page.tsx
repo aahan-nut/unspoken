@@ -10,7 +10,12 @@ export const metadata: Metadata = {
 
 export default function SupportPage() {
   return (
-    <AppShell>
+    <AppShell
+      intro={{
+        title: "Here's what we heard",
+        back: { href: "/check-in", label: "Back to check-in" },
+      }}
+    >
       <SupportContent />
     </AppShell>
   );

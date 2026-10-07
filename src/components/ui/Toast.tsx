@@ -25,7 +25,7 @@ interface ToastContextValue {
 const ToastContext = createContext<ToastContextValue | undefined>(undefined);
 
 const variantConfig: Record<ToastVariant, { icon: typeof Info; styles: string }> = {
-  success: { icon: CheckCircle2, styles: "border-sage-400/40 bg-sage-100 text-sage-800" },
+  success: { icon: CheckCircle2, styles: "border-sky-400/40 bg-sky-100 text-sky-800" },
   info: { icon: Info, styles: "border-border bg-card text-foreground" },
   error: { icon: TriangleAlert, styles: "border-red-200 bg-red-50 text-red-900" },
 };

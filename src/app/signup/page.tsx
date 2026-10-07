@@ -11,17 +11,14 @@ export const metadata: Metadata = {
 
 export default function SignupPage() {
   return (
-    <AppShell>
+    <AppShell
+      intro={{
+        title: "Create an account",
+        description: "Save resources, track their status, and keep private notes.",
+      }}
+    >
       <PageContainer narrow>
         <div className="mx-auto max-w-sm">
-          <div className="mb-8 text-center">
-            <h1 className="text-2xl font-semibold text-foreground sm:text-3xl">
-              Create an account
-            </h1>
-            <p className="mt-2 text-muted">
-              Save resources, track their status, and keep private notes.
-            </p>
-          </div>
           <Card padding="lg">
             <SignupForm />
           </Card>

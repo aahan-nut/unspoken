@@ -1,3 +1,4 @@
+import "server-only";
 import { milesBetween } from "@/lib/geo/distance";
 import type { ResourceCategoryQuery } from "@/lib/geo/schema";
 import type { NearbyResource } from "@/types/geo";
@@ -36,6 +37,14 @@ const CATEGORY_QUERIES: Record<ResourceCategoryQuery, string> = {
   "community-health-center": "community health center",
   "youth-support": "youth support service",
   "family-counseling": "family counseling service",
+  "developmental-pediatrics": "developmental pediatrician",
+  "autism-support": "autism support organization",
+  "occupational-therapy": "occupational therapy",
+  "speech-therapy": "speech language pathologist",
+  "behavioral-health-center": "behavioral health center",
+  "family-support": "family support services",
+  "pediatric-behavioral-health": "pediatric behavioral health",
+  "child-psychologist": "child psychologist",
 };
 
 export class PlacesConfigError extends Error {

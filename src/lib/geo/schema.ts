@@ -14,6 +14,16 @@ export const RESOURCE_CATEGORIES = [
   "community-health-center",
   "youth-support",
   "family-counseling",
+  // Added for the Parent Support section (autism/ADHD nearby search) —
+  // reuses this same search infrastructure rather than a separate system.
+  "developmental-pediatrics",
+  "autism-support",
+  "occupational-therapy",
+  "speech-therapy",
+  "behavioral-health-center",
+  "family-support",
+  "pediatric-behavioral-health",
+  "child-psychologist",
 ] as const;
 
 export type ResourceCategoryQuery = (typeof RESOURCE_CATEGORIES)[number];
@@ -62,4 +72,12 @@ export const resourceCategoryOptions: { value: ResourceCategoryQuery; label: str
   { value: "community-health-center", label: "Community health center" },
   { value: "youth-support", label: "Youth support service" },
   { value: "family-counseling", label: "Family counseling service" },
+  { value: "developmental-pediatrics", label: "Developmental pediatric services" },
+  { value: "autism-support", label: "Autism support organization" },
+  { value: "occupational-therapy", label: "Occupational therapy" },
+  { value: "speech-therapy", label: "Speech-language services" },
+  { value: "behavioral-health-center", label: "Behavioral health center" },
+  { value: "family-support", label: "Family support organization" },
+  { value: "pediatric-behavioral-health", label: "Pediatric behavioral health" },
+  { value: "child-psychologist", label: "Child psychologist" },
 ];

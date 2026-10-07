@@ -30,7 +30,6 @@ import type {
 import { findLabel } from "@/lib/utils";
 import { useClientValue } from "@/lib/useClientValue";
 import { ArrowLeft, ArrowRight, RotateCcw } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -158,23 +157,6 @@ export function SayItFlow() {
 
   return (
     <PageContainer narrow>
-      <div className="mb-8">
-        <Link
-          href="/support"
-          className="mb-6 inline-flex items-center gap-1 text-sm text-muted transition-colors hover:text-foreground"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back
-        </Link>
-        <h1 className="text-2xl font-semibold text-foreground sm:text-3xl">
-          Help Me Say It
-        </h1>
-        <p className="mt-2 text-muted">
-          Not knowing how to start the conversation is one of the biggest
-          barriers to getting support. Let&apos;s draft a starting point together.
-        </p>
-      </div>
-
       <ProgressIndicator
         currentStep={step}
         totalSteps={TOTAL_STEPS}
@@ -222,7 +204,7 @@ export function SayItFlow() {
           </div>
 
           {checkIn && checkInLabel && (
-            <Card padding="sm" className="bg-sage-100/60">
+            <Card padding="sm" className="bg-sky-100/60">
               <p className="text-sm text-foreground">
                 We found a recent check-in and filled this in for you:{" "}
                 <span className="font-medium">{checkInLabel}</span>

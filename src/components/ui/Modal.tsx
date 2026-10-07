@@ -43,7 +43,7 @@ export function Modal({
       ref={dialogRef}
       onClose={onClose}
       className={cn(
-        "fixed inset-0 z-50 m-auto w-[calc(100%-2rem)] rounded-2xl border border-border bg-card p-0 shadow-xl backdrop:bg-black/40",
+        "fixed inset-0 z-50 m-auto w-[calc(100%-2rem)] rounded-[24px] border border-border bg-card p-0 shadow-xl backdrop:bg-black/40",
         sizeStyles[size]
       )}
     >

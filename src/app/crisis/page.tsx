@@ -3,7 +3,7 @@ import { PageContainer } from "@/components/layout/PageContainer";
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { MessageCircleHeart, Phone, TriangleAlert, Users2 } from "lucide-react";
+import { MessageCircleHeart, Phone, Users2 } from "lucide-react";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -13,18 +13,14 @@ export const metadata: Metadata = {
 
 export default function CrisisPage() {
   return (
-    <AppShell showCrisisBanner={false}>
+    <AppShell
+      showCrisisBanner={false}
+      intro={{
+        eyebrow: "Crisis support",
+        title: "If you're in danger right now, get help immediately.",
+      }}
+    >
       <PageContainer narrow>
-        <div className="mb-8 text-center">
-          <div className="mb-4 flex justify-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-red-50">
-              <TriangleAlert className="h-7 w-7 text-red-700" aria-hidden="true" />
-            </div>
-          </div>
-          <h1 className="text-2xl font-semibold text-foreground sm:text-3xl">
-            If you&apos;re in danger right now, get help immediately.
-          </h1>
-        </div>
 
         <Alert variant="error" title="Unspoken cannot provide emergency assistance" className="mb-8">
           This platform is not equipped to respond to emergencies. If you are in
@@ -63,7 +59,7 @@ export default function CrisisPage() {
 
         <div className="mb-8 space-y-4">
           <Card padding="md" className="flex items-start gap-4">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-secondary">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary">
               <Users2 className="h-5 w-5 text-secondary-foreground" />
             </div>
             <p className="text-sm leading-relaxed text-foreground">
@@ -71,7 +67,7 @@ export default function CrisisPage() {
             </p>
           </Card>
           <Card padding="md" className="flex items-start gap-4">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-secondary">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary">
               <MessageCircleHeart className="h-5 w-5 text-secondary-foreground" />
             </div>
             <p className="text-sm leading-relaxed text-foreground">

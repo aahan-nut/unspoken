@@ -19,35 +19,32 @@ const footerLinks = {
   ],
 };
 
+const headingClass = "mb-3 text-[13px] font-medium uppercase tracking-[0.08em] text-white/75";
+const linkClass = "text-[15px] text-white transition-opacity hover:opacity-75";
+
+/** Slate footer that continues the page frame. */
 export function Footer() {
   return (
-    <footer className="mt-auto border-t border-border bg-card">
-      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
+    <footer className="mt-auto bg-frame text-white">
+      {/* Gutter = frame gap + panel gutter, so columns line up with panel content. */}
+      <div className="px-[clamp(32px,7.6vw,132px)] pb-12 pt-10">
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           <div className="lg:col-span-1">
-            <div className="mb-3 flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-sage-600 to-sage-500">
-                <span className="text-xs font-bold text-white">U</span>
-              </div>
-              <span className="font-semibold text-foreground">Unspoken</span>
+            <div className="mb-3 text-[28px] font-medium leading-none tracking-[-0.02em]">
+              Unspoken
             </div>
-            <p className="text-sm leading-relaxed text-muted">
+            <p className="text-sm leading-relaxed text-white/75">
               A calm space to reflect, prepare, and find support — designed for
               teens and young adults.
             </p>
           </div>
 
           <div>
-            <h3 className="mb-3 text-sm font-semibold text-foreground">
-              Platform
-            </h3>
+            <h3 className={headingClass}>Platform</h3>
             <ul className="space-y-2">
               {footerLinks.platform.map((link) => (
                 <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-muted transition-colors hover:text-foreground"
-                  >
+                  <Link href={link.href} className={linkClass}>
                     {link.label}
                   </Link>
                 </li>
@@ -56,15 +53,13 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="mb-3 text-sm font-semibold text-foreground">
-              Crisis & Safety
-            </h3>
+            <h3 className={headingClass}>Crisis & Safety</h3>
             <ul className="space-y-2">
               {footerLinks.safety.map((link) => (
                 <li key={link.href}>
                   <a
                     href={link.href}
-                    className="text-sm text-muted transition-colors hover:text-foreground"
+                    className={linkClass}
                     {...(link.href.startsWith("http") && {
                       target: "_blank",
                       rel: "noopener noreferrer",
@@ -78,16 +73,11 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="mb-3 text-sm font-semibold text-foreground">
-              Privacy & Legal
-            </h3>
+            <h3 className={headingClass}>Privacy & Legal</h3>
             <ul className="space-y-2">
               {footerLinks.legal.map((link) => (
                 <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-muted transition-colors hover:text-foreground"
-                  >
+                  <Link href={link.href} className={linkClass}>
                     {link.label}
                   </Link>
                 </li>
@@ -96,13 +86,13 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 border-t border-border pt-6">
-          <p className="text-center text-xs leading-relaxed text-muted">
+        <div className="mt-10 border-t border-white/15 pt-6">
+          <p className="text-center text-xs leading-relaxed text-white/75">
             Unspoken is not a substitute for professional mental health care,
             therapy, or emergency services. If you are in crisis, please contact
             the 988 Suicide & Crisis Lifeline or call 911.
           </p>
-          <p className="mt-2 text-center text-xs text-muted/70">
+          <p className="mt-2 text-center text-xs text-white/75">
             &copy; {new Date().getFullYear()} Unspoken. All rights reserved.
           </p>
         </div>

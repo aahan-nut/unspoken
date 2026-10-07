@@ -29,7 +29,12 @@ export default async function SavedPage() {
     .order("created_at", { ascending: false });
 
   return (
-    <AppShell>
+    <AppShell
+      intro={{
+        title: "Saved resources",
+        description: "Resources you've saved, plus your own status and private notes.",
+      }}
+    >
       <SavedContent
         initialEntries={(data ?? []) as SavedResourceRow[]}
         initialError={error ? "Couldn't load your saved resources. Try refreshing the page." : null}

@@ -23,7 +23,7 @@ export function ErrorState({
       )}
       role="alert"
     >
-      <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-red-100">
+      <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-100">
         <AlertCircle className="h-7 w-7 text-destructive" />
       </div>
       <h3 className="mb-2 text-lg font-semibold text-red-900">{title}</h3>

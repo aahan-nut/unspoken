@@ -1,11 +1,18 @@
+import "server-only";
 import { GoogleGenAI, Type } from "@google/genai";
 import { containsCrisisLanguage } from "@/lib/ai/crisis";
 import type { GenerateMessageRequest, GenerateMessageResult } from "@/lib/ai/schema";
 import type { ClassifyInput, SafetyLevel, SupportResponseInput } from "@/lib/safety/types";
+import { withTimeout } from "@/lib/timeout";
 
 // Using the "-latest" alias rather than pinning a specific model version so
 // this keeps working as Google rolls the flash tier forward.
 const MODEL = "gemini-flash-latest";
+
+// The @google/genai SDK doesn't expose a per-call AbortSignal, so this races
+// the request against a timer instead — it won't cancel the underlying HTTP
+// call, but it stops an API route from hanging indefinitely if Gemini stalls.
+const GEMINI_TIMEOUT_MS = 15_000;
 
 let client: GoogleGenAI | null = null;
 
@@ -81,29 +88,33 @@ export async function generateSupportiveMessage(
   const ai = getClient();
   const prompt = buildPrompt(input);
 
-  const response = await ai.models.generateContent({
-    model: MODEL,
-    contents: prompt,
-    config: {
-      responseMimeType: "application/json",
-      responseSchema: {
-        type: Type.OBJECT,
-        properties: {
-          isCrisis: {
-            type: Type.BOOLEAN,
-            description:
-              "True if the situation describes immediate danger, suicidal thoughts, self-harm, or abuse.",
+  const response = await withTimeout(
+    ai.models.generateContent({
+      model: MODEL,
+      contents: prompt,
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            isCrisis: {
+              type: Type.BOOLEAN,
+              description:
+                "True if the situation describes immediate danger, suicidal thoughts, self-harm, or abuse.",
+            },
+            message: {
+              type: Type.STRING,
+              description: "The supportive message draft. Empty string if isCrisis is true.",
+            },
           },
-          message: {
-            type: Type.STRING,
-            description: "The supportive message draft. Empty string if isCrisis is true.",
-          },
+          required: ["isCrisis", "message"],
         },
-        required: ["isCrisis", "message"],
+        temperature: 0.6,
       },
-      temperature: 0.6,
-    },
-  });
+    }),
+    GEMINI_TIMEOUT_MS,
+    "Message generation timed out."
+  );
 
   const text = response.text;
   if (!text) {
@@ -179,25 +190,29 @@ export async function classifySafetyLevel(input: ClassifyInput): Promise<SafetyL
   const ai = getClient();
   const prompt = buildClassificationPrompt(input);
 
-  const response = await ai.models.generateContent({
-    model: MODEL,
-    contents: prompt,
-    config: {
-      responseMimeType: "application/json",
-      responseSchema: {
-        type: Type.OBJECT,
-        properties: {
-          safetyLevel: {
-            type: Type.STRING,
-            enum: [...SAFETY_LEVELS],
-            description: "The single routing category that best fits this check-in.",
+  const response = await withTimeout(
+    ai.models.generateContent({
+      model: MODEL,
+      contents: prompt,
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            safetyLevel: {
+              type: Type.STRING,
+              enum: [...SAFETY_LEVELS],
+              description: "The single routing category that best fits this check-in.",
+            },
           },
+          required: ["safetyLevel"],
         },
-        required: ["safetyLevel"],
+        temperature: 0.1,
       },
-      temperature: 0.1,
-    },
-  });
+    }),
+    GEMINI_TIMEOUT_MS,
+    "Safety classification timed out."
+  );
 
   const text = response.text;
   if (!text) {
@@ -263,36 +278,40 @@ export async function generateSupportResponseAI(input: SupportResponseInput): Pr
   const ai = getClient();
   const prompt = buildSupportResponsePrompt(input);
 
-  const response = await ai.models.generateContent({
-    model: MODEL,
-    contents: prompt,
-    config: {
-      responseMimeType: "application/json",
-      responseSchema: {
-        type: Type.OBJECT,
-        properties: {
-          acknowledgment: { type: Type.STRING },
-          summary: { type: Type.STRING },
-          immediateAction: { type: Type.STRING },
-          nextStep: { type: Type.STRING },
-          suggestedDestination: {
-            type: Type.STRING,
-            enum: ["message_builder", "resources", "self_reflection"],
+  const response = await withTimeout(
+    ai.models.generateContent({
+      model: MODEL,
+      contents: prompt,
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            acknowledgment: { type: Type.STRING },
+            summary: { type: Type.STRING },
+            immediateAction: { type: Type.STRING },
+            nextStep: { type: Type.STRING },
+            suggestedDestination: {
+              type: Type.STRING,
+              enum: ["message_builder", "resources", "self_reflection"],
+            },
+            disclaimer: { type: Type.STRING },
           },
-          disclaimer: { type: Type.STRING },
+          required: [
+            "acknowledgment",
+            "summary",
+            "immediateAction",
+            "nextStep",
+            "suggestedDestination",
+            "disclaimer",
+          ],
         },
-        required: [
-          "acknowledgment",
-          "summary",
-          "immediateAction",
-          "nextStep",
-          "suggestedDestination",
-          "disclaimer",
-        ],
+        temperature: 0.6,
       },
-      temperature: 0.6,
-    },
-  });
+    }),
+    GEMINI_TIMEOUT_MS,
+    "Support-response generation timed out."
+  );
 
   const text = response.text;
   if (!text) {

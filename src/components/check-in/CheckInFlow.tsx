@@ -23,7 +23,6 @@ import {
 import type { Duration, Feeling, Intensity, SupportType } from "@/types/checkIn";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { useState } from "react";
 
 const TOTAL_STEPS = 6;
@@ -132,22 +131,6 @@ export function CheckInFlow() {
 
   return (
     <PageContainer narrow>
-      <div className="mb-8">
-        <Link
-          href="/"
-          className="mb-6 inline-flex items-center gap-1 text-sm text-muted transition-colors hover:text-foreground"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to home
-        </Link>
-        <h1 className="text-2xl font-semibold text-foreground sm:text-3xl">
-          Check in with yourself
-        </h1>
-        <p className="mt-2 text-muted">
-          Take your time. There are no wrong answers here.
-        </p>
-      </div>
-
       <ProgressIndicator
         currentStep={step}
         totalSteps={TOTAL_STEPS}

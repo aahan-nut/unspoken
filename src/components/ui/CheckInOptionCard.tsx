@@ -32,7 +32,7 @@ export function CheckInOptionCard({
       aria-pressed={selected}
       onClick={onClick}
       className={cn(
-        "flex w-full items-center gap-3 rounded-xl border-2 text-left transition-all duration-200",
+        "flex w-full items-center gap-3 rounded-2xl border-2 text-left transition-all duration-200",
         roomy ? "items-start p-4" : "px-4 py-3",
         selected
           ? "border-primary bg-primary/5 shadow-sm"
@@ -41,7 +41,7 @@ export function CheckInOptionCard({
       )}
     >
       {Icon && (
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-secondary">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary">
           <Icon className="h-5 w-5 text-secondary-foreground" aria-hidden="true" />
         </div>
       )}

@@ -15,7 +15,7 @@ export function PageContainer({
   return (
     <div
       className={cn(
-        "mx-auto w-full px-4 py-8 sm:px-6 sm:py-12 lg:px-8",
+        "mx-auto w-full px-5 py-10 sm:px-8 sm:py-14 lg:px-10",
         narrow ? "max-w-3xl" : "max-w-6xl",
         className
       )}
@@ -49,13 +49,13 @@ export function SectionHeading({
         className
       )}
     >
-      <Heading className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+      <Heading className="text-balance text-[clamp(24px,2.4vw,34px)] font-semibold uppercase leading-[1.1] text-foreground">
         {title}
       </Heading>
       {description && (
         <p
           className={cn(
-            "mt-3 max-w-2xl text-muted leading-relaxed",
+            "mt-3 max-w-2xl text-pretty text-[17px] leading-[1.6] text-muted",
             centered && "mx-auto"
           )}
         >
